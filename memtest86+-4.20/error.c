@@ -355,32 +355,45 @@ static void update_err_ranges(ulong *adr, ulong good,int type)
         return;
     }
 
-    int within = 0;
     int i;
-    //Check if address is within existing range
-    for (i = 0; i<v->err_range.size; i++){
-        if ((v->err_range.ranges[i].low_addr - RANGE <= adr) && (v->err_range.ranges[i].high_addr + RANGE >= adr)){
-            //is within range
+    int hit = 0;
+    //Check stride
+    for (i=0; i<v->err_range.size; i++){
+        if (v->err_range.ranges[i].count_per_range==1){
+            //second entry.. add to range, set stride
+            //assumed add to high
+            v->err_range.ranges[i].high_addr = (ulong) adr;
+            v->err_range.ranges[i].high_po.page = page;
+            v->err_range.ranges[i].high_po.offset = offset;
             v->err_range.ranges[i].count_per_range++;
-            if (adr>v->err_range.ranges[i].high_addr){
-                //replace high
-                v->err_range.ranges[i].high_addr = (ulong) adr;
-                v->err_range.ranges[i].high_po.page = page;
-                v->err_range.ranges[i].high_po.offset = offset;
-            }
-            else if (adr<v->err_range.ranges[i].low_addr){
-                //replace low
-                v->err_range.ranges[i].low_addr = (ulong) adr;
-                v->err_range.ranges[i].low_po.page = page;
-                v->err_range.ranges[i].low_po.offset = offset;
-            }
-            within = 1;
+            //set stride
+            v->err_range.ranges[i].range_stride = (ulong)adr - v->err_range.ranges[i].low_addr;
+            hit = 1;
+
+            //update histogram
+            //for (j=0; j<32; j++){
+            //    v->err_range.ranges[i].hist[j] += (err_bits>>j) & 1;
+            //}
+            break;
+        }
+        else if ((v->err_range.ranges[i].high_addr+v->err_range.ranges[i].range_stride) == adr){
+            //hits stride, add
+            //assumed add to high
+            v->err_range.ranges[i].high_addr = (ulong) adr;
+            v->err_range.ranges[i].high_po.page = page;
+            v->err_range.ranges[i].high_po.offset = offset;
+            v->err_range.ranges[i].count_per_range++;
+            hit = 1;
+            //update histogram
+            //for (j=0; j<32; j++){
+            //    v->err_range.ranges[i].hist[j] += (err_bits>>j) & (~1);
+            //}
             break;
         }
     }
 
-    if (within == 0){
-        //create new entry
+    if (hit == 0){
+        //add new entry
         v->err_range.size++;
         int err_idx = v->err_range.size - 1;
         v->err_range.ranges[err_idx].low_addr = (ulong) adr;
@@ -390,7 +403,47 @@ static void update_err_ranges(ulong *adr, ulong good,int type)
         v->err_range.ranges[err_idx].high_po.page = page;
         v->err_range.ranges[err_idx].high_po.offset = offset;
         v->err_range.ranges[err_idx].count_per_range = 1;
+        //update histogram
+        //for (j=0; j<32; j++){
+        //    v->err_range.ranges[i].hist[j] += (err_bits>>j) & (~1);
+        //}
     }
+
+    //int within = 0;
+    ////Check if address is within existing range
+    //for (i = 0; i<v->err_range.size; i++){
+    //    if ((v->err_range.ranges[i].low_addr - RANGE <= adr) && (v->err_range.ranges[i].high_addr + RANGE >= adr)){
+    //        //is within range
+    //        v->err_range.ranges[i].count_per_range++;
+    //        if (adr>v->err_range.ranges[i].high_addr){
+    //            //replace high
+    //            v->err_range.ranges[i].high_addr = (ulong) adr;
+    //            v->err_range.ranges[i].high_po.page = page;
+    //            v->err_range.ranges[i].high_po.offset = offset;
+    //        }
+    //        else if (adr<v->err_range.ranges[i].low_addr){
+    //            //replace low
+    //            v->err_range.ranges[i].low_addr = (ulong) adr;
+    //            v->err_range.ranges[i].low_po.page = page;
+    //            v->err_range.ranges[i].low_po.offset = offset;
+    //        }
+    //        within = 1;
+    //        break;
+    //    }
+    //}
+
+    //if (within == 0){
+    //    //create new entry
+    //    v->err_range.size++;
+    //    int err_idx = v->err_range.size - 1;
+    //    v->err_range.ranges[err_idx].low_addr = (ulong) adr;
+    //    v->err_range.ranges[err_idx].low_po.page = page;
+    //    v->err_range.ranges[err_idx].low_po.offset = offset;
+    //    v->err_range.ranges[err_idx].high_addr = (ulong) adr;
+    //    v->err_range.ranges[err_idx].high_po.page = page;
+    //    v->err_range.ranges[err_idx].high_po.offset = offset;
+    //    v->err_range.ranges[err_idx].count_per_range = 1;
+    //}
 }
 
 static void print_err_counts(void)

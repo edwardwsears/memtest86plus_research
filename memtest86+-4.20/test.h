@@ -316,7 +316,11 @@ struct range_t {
 	ulong   high_addr;
     struct xadr high_po;
 
+    int range_stride;
     int count_per_range;
+    //Failed bits histogram
+    //hist[0] is lowest bit
+    //unsigned long hist[32];
 };
 struct err_range_t {
     int size;

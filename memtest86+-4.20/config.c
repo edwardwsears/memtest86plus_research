@@ -368,41 +368,33 @@ void get_config()
 			popclear();
 			wait_keyup();
             int err_idx = 0;
-            //XXX fake data
-            //v->err_range.ranges[0].low_addr = (ulong) 0x12342;
-            //v->err_range.ranges[0].low_po.page = (ulong) 0x12000;
-            //v->err_range.ranges[0].low_po.offset = (ulong) 0x342;
-            //v->err_range.ranges[0].high_addr = (ulong) 0x12346;
-            //v->err_range.ranges[0].high_po.page = (ulong) 0x12000;
-            //v->err_range.ranges[0].high_po.offset = (ulong) 0x346;
-            //v->err_range.ranges[0].count_per_range = (int) 3;
-
-            //v->err_range.ranges[1].low_addr = (ulong) 0x13350;
-            //v->err_range.ranges[0].low_po.page = (ulong) 0x13000;
-            //v->err_range.ranges[0].low_po.offset = (ulong) 0x350;
-            //v->err_range.ranges[1].high_addr = (ulong) 0x13360;
-            //v->err_range.ranges[0].high_po.page = (ulong) 0x13000;
-            //v->err_range.ranges[0].high_po.offset = (ulong) 0x360;
-            //v->err_range.ranges[1].count_per_range = (int) 5;
-            //v->err_range.size=2;
-            //XXX ^^^
-            //Cprint data structure to screen one at a time
 			cprint(POP_Y+1, POP_X+2, "Consecutive Failing Addresses:");
 			cprint(POP_Y+3, POP_X+14, " of ");
 			dprint(POP_Y+3, POP_X+19, v->err_range.size,4,0);
-			cprint(POP_Y+4, POP_X+6, "High Address: 0x");
-			cprint(POP_Y+5, POP_X+6, "Low Address:  0x");
-			//cprint(POP_Y+7, POP_X+6, "Hit 1 to Continue, 0 to quit"); //option 1
-			cprint(POP_Y+7, POP_X+6, "Hit a key to Continue"); //option 2
+			cprint(POP_Y+5, POP_X+6, "Errors in range: ");
+			cprint(POP_Y+6, POP_X+6, "Range Stride: ");
+			cprint(POP_Y+7, POP_X+6, "High Address: 0x");
+			cprint(POP_Y+8, POP_X+6, "Low Address:  0x");
+			cprint(POP_Y+9, POP_X+6, "Histogram of faulty bits: <-bit 31, bit 0 ->");
+
+			cprint(POP_Y+12, POP_X+6, "Hit 1 to Continue, 0 to quit"); //option 1
+			//cprint(POP_Y+12, POP_X+6, "Hit a key to Continue"); //option 2
 
             i = 1;
+            int j = 0;
             //loop through all records
             while ((i==1) && (err_idx<v->err_range.size)){
                 dprint(POP_Y+3, POP_X+6, err_idx+1,8,0);//number
-                hprint(POP_Y+4, POP_X+22, v->err_range.ranges[err_idx].high_addr);//high addr
-                hprint(POP_Y+5, POP_X+22, v->err_range.ranges[err_idx].low_addr);//low addr
-                //i = getval(POP_Y+8, POP_X+24, 0); //option 1
-			    wait_keyup(); //option 2
+                hprint(POP_Y+5, POP_X+22, v->err_range.ranges[err_idx].count_per_range);//err count per range
+                hprint(POP_Y+6, POP_X+22, v->err_range.ranges[err_idx].range_stride);//stride per range
+                hprint(POP_Y+7, POP_X+22, v->err_range.ranges[err_idx].high_addr);//high addr
+                hprint(POP_Y+8, POP_X+22, v->err_range.ranges[err_idx].low_addr);//low addr
+                //print histogram
+                //for (j=0;j<32;j++){
+                //    dprint(POP_Y+10, POP_X+6+(j*5), v->err_range.ranges[err_idx].hist[j],4,0);
+                //}
+                i = getval(POP_Y+12, POP_X+34, 0); //option 1
+			    //wait_keyup(); //option 2
                 err_idx++;
             }
 			//popup();
