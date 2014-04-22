@@ -386,7 +386,7 @@ static void update_err_ranges(ulong *adr, ulong good,int type, ulong err_bits)
             hit = 1;
             //update histogram
             for (j=0; j<32; j++){
-                v->err_range.ranges[i].hist[j] += (err_bits>>j) & (~1);
+                v->err_range.ranges[i].hist[j] += (err_bits>>j) & 1;
             }
             break;
         }
