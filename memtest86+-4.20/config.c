@@ -394,7 +394,7 @@ void get_config()
                 //print histogram
                 for (j=0;j<32;j++){
                     mag = 0;
-                    h = v->err_range.ranges[err_idx].hist[j]
+                    h = v->err_range.ranges[err_idx].hist[j];
                     while (h>0){
                         mag++;
                         h = h>>1;
