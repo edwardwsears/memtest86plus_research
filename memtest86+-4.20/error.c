@@ -355,7 +355,7 @@ static void update_err_ranges(ulong *adr, ulong good,int type, ulong err_bits)
         return;
     }
 
-    int i;
+    int i,j;
     int hit = 0;
     //Check stride
     for (i=0; i<v->err_range.size; i++){
