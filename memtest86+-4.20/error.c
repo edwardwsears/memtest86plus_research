@@ -22,7 +22,7 @@ extern short dmi_initialized;
 void poll_errors();
 
 static void update_err_counts(void);
-static void update_err_ranges(ulong *adr, ulong good,int type);
+static void update_err_ranges(ulong *adr, ulong good,int type,ulong err_bits);
 static void print_err_counts(void);
 static int syn, chan, len=1;
 
@@ -37,7 +37,7 @@ void common_err( ulong *adr, ulong good, ulong bad, ulong xor, int type)
 	ulong mb;
 
 	update_err_counts();
-	update_err_ranges(adr,good,type);
+	update_err_ranges(adr,good,type,good^bad);
 	add_dmi_err((ulong)adr);
 
 	switch(v->printmode) {
@@ -207,10 +207,10 @@ void common_err( ulong *adr, ulong good, ulong bad, ulong xor, int type)
 		}
 		if (v->erri.hdr_flag == 0) {
 			clear_scroll();
-			cprint(LINE_HEADER, 0,
-"Tst  Pass   Failing Address          Good       Bad     Err-Bits  Count Chan");
-			cprint(LINE_HEADER+1, 0,
-"---  ----  -----------------------  --------  --------  --------  ----- ----");
+			//cprint(LINE_HEADER, 0,
+//"Tst  Pass   Failing Address          Good       Bad     Err-Bits  Count Chan");
+			//cprint(LINE_HEADER+1, 0,
+//"---  ----  -----------------------  --------  --------  --------  ----- ----");
 			v->erri.hdr_flag++;
 		}
 		/* Check for keyboard input */
@@ -225,32 +225,32 @@ void common_err( ulong *adr, ulong good, ulong bad, ulong xor, int type)
 			offset = ((unsigned long)adr) & 0xFFF;
 		}
 		mb = page >> 8;
-		dprint(v->msg_line, 0, v->test, 3, 0);
-		dprint(v->msg_line, 4, v->pass, 5, 0);
-		hprint(v->msg_line, 11, page);
-		hprint2(v->msg_line, 19, offset, 3);
-		cprint(v->msg_line, 22, " -      . MB");
-		dprint(v->msg_line, 25, mb, 5, 0);
-		dprint(v->msg_line, 31, ((page & 0xFF)*10)/256, 1, 0);
+		//dprint(v->msg_line, 0, v->test, 3, 0);
+		//dprint(v->msg_line, 4, v->pass, 5, 0);
+		//hprint(v->msg_line, 11, page);
+		//hprint2(v->msg_line, 19, offset, 3);
+		//cprint(v->msg_line, 22, " -      . MB");
+		//dprint(v->msg_line, 25, mb, 5, 0);
+		//dprint(v->msg_line, 31, ((page & 0xFF)*10)/256, 1, 0);
 
 		if (type == 3) {
 			/* ECC error */
-			cprint(v->msg_line, 36, 
-			  bad?"corrected           ": "uncorrected         ");
-			hprint2(v->msg_line, 60, syn, 4);
-			cprint(v->msg_line, 68, "ECC"); 
-			dprint(v->msg_line, 74, chan, 2, 0);
+			//cprint(v->msg_line, 36, 
+			//  bad?"corrected           ": "uncorrected         ");
+			//hprint2(v->msg_line, 60, syn, 4);
+			//cprint(v->msg_line, 68, "ECC"); 
+			//dprint(v->msg_line, 74, chan, 2, 0);
 		} else if (type == 2) {
-			cprint(v->msg_line, 36, "Parity error detected                ");
+			//cprint(v->msg_line, 36, "Parity error detected                ");
 		} else {
-			hprint(v->msg_line, 36, good);
-			hprint(v->msg_line, 46, bad);
-			hprint(v->msg_line, 56, xor);
-			dprint(v->msg_line, 66, v->ecount, 5, 0);
+			//hprint(v->msg_line, 36, good);
+			//hprint(v->msg_line, 46, bad);
+			//hprint(v->msg_line, 56, xor);
+			//dprint(v->msg_line, 66, v->ecount, 5, 0);
 			v->erri.exor = xor;
 		}
 		v->erri.eadr = (ulong)adr;
-		print_err_counts();
+		//print_err_counts();
 		break;
 
 	case PRINTMODE_PATTERNS:
@@ -340,7 +340,7 @@ static void update_err_counts(void)
 }
 
 //update range data structure for errors
-static void update_err_ranges(ulong *adr, ulong good,int type)
+static void update_err_ranges(ulong *adr, ulong good,int type, ulong err_bits)
 {
 	ulong page, offset;
     if ( type == 2 || type == 3) {
@@ -371,9 +371,9 @@ static void update_err_ranges(ulong *adr, ulong good,int type)
             hit = 1;
 
             //update histogram
-            //for (j=0; j<32; j++){
-            //    v->err_range.ranges[i].hist[j] += (err_bits>>j) & 1;
-            //}
+            for (j=0; j<32; j++){
+                v->err_range.ranges[i].hist[j] += (err_bits>>j) & 1;
+            }
             break;
         }
         else if ((v->err_range.ranges[i].high_addr+v->err_range.ranges[i].range_stride) == adr){
@@ -385,9 +385,9 @@ static void update_err_ranges(ulong *adr, ulong good,int type)
             v->err_range.ranges[i].count_per_range++;
             hit = 1;
             //update histogram
-            //for (j=0; j<32; j++){
-            //    v->err_range.ranges[i].hist[j] += (err_bits>>j) & (~1);
-            //}
+            for (j=0; j<32; j++){
+                v->err_range.ranges[i].hist[j] += (err_bits>>j) & (~1);
+            }
             break;
         }
     }

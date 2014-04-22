@@ -1,0 +1,14 @@
+4/16-4/22
+Number of ranges: 2
+
+Range 1
+Errors: 0x10dee840
+Stride: 4
+High Adr: 0x4b8ba0fc
+Low Addr: 0x08100000
+
+Range 2
+Errors: 0x000007da
+Stride: 4
+High Adr: 0x08101f68
+Low Addr: 0x08100004

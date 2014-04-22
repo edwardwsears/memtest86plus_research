@@ -382,6 +382,8 @@ void get_config()
 
             i = 1;
             int j = 0;
+            int mag;
+            ulong h;
             //loop through all records
             while ((i==1) && (err_idx<v->err_range.size)){
                 dprint(POP_Y+3, POP_X+6, err_idx+1,8,0);//number
@@ -390,9 +392,15 @@ void get_config()
                 hprint(POP_Y+7, POP_X+22, v->err_range.ranges[err_idx].high_addr);//high addr
                 hprint(POP_Y+8, POP_X+22, v->err_range.ranges[err_idx].low_addr);//low addr
                 //print histogram
-                //for (j=0;j<32;j++){
-                //    dprint(POP_Y+10, POP_X+6+(j*5), v->err_range.ranges[err_idx].hist[j],4,0);
-                //}
+                for (j=0;j<32;j++){
+                    mag = 0;
+                    h = v->err_range.ranges[err_idx].hist[j]
+                    while (h>0){
+                        mag++;
+                        h = h>>1;
+                    }
+                    dprint(POP_Y+10, POP_X+6+(j*5), mag,4,0);
+                }
                 i = getval(POP_Y+12, POP_X+34, 0); //option 1
 			    //wait_keyup(); //option 2
                 err_idx++;
