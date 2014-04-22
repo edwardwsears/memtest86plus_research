@@ -390,6 +390,10 @@ static void update_err_ranges(ulong *adr, ulong good,int type, ulong err_bits)
             }
             break;
         }
+        else if (v->err_range.ranges[i].low_addr == adr){
+            //duplicate range
+            hit = 1;
+        }
     }
 
     if (hit == 0){
@@ -404,9 +408,9 @@ static void update_err_ranges(ulong *adr, ulong good,int type, ulong err_bits)
         v->err_range.ranges[err_idx].high_po.offset = offset;
         v->err_range.ranges[err_idx].count_per_range = 1;
         //update histogram
-        //for (j=0; j<32; j++){
-        //    v->err_range.ranges[i].hist[j] += (err_bits>>j) & (~1);
-        //}
+        for (j=0; j<32; j++){
+            v->err_range.ranges[i].hist[j] += (err_bits>>j) & 1;
+        }
     }
 
     //int within = 0;
