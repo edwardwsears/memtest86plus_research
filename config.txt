@@ -1,0 +1,4 @@
+Num DIMMs: 10
+Channel Bits: 0
+Bank Bits: 1,2
+DIMM Bits: 3,4,5
