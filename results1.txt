@@ -1,8 +1,19 @@
-4/16-4/22
-Number of ranges: 2
+5/13 DIMMs 1-10 (counting on box from side with "DIMM+" marking)
+PowerEdge T620
+Memory Size: 44 GB (ECC DDR3) 1067 MHz
+Processor: Intel Xeon CPU E5-2603 0 @ 1.8GHz
+L2 cache: 4x256 KB
+L3 cache: 10MB
+Cores: 4
 
 Range 1
-Errors: 0x10dee840
+Errors: 0x1dfbffc0
 Stride: 4
-High Addr: 0x4b8ba0fc
+High Addr: 0x7ffffefc
 Low Addr: 0x08100000
+
+Range 2
+Errors: 0x1a5e5dd4
+Stride: 4
+High Addr: 0x7ffffefc
+Low Addr: 0x168687b0
